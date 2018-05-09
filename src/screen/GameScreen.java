@@ -16,6 +16,7 @@ public class GameScreen extends Screen{
 	
 	public void init() {
 		super.init();
+		map.updateCap = 10000000;
 	}
 	
 	public void update() {

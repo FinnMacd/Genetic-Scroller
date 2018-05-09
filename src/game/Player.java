@@ -9,15 +9,11 @@ public class Player {
 	
 	private Map map;
 	
-	private int maxSpeed = 5, width = 40, height = 70;
-	private double x,y,vx,vy, sightAngle = 0.1;
+	private int maxSpeed = 5, width = 40, height = 70, jumpTime = 0, scoreOffset = 0;
+	private double x,y,vx,vy;
 	
 	private int[][] sightPoints;
-	private boolean sightCheck = false, isAlive = false, isFalling = false, isMoving = false;
-	
-	public int numUpgrades = 0;
-	
-	public double carry = 0;
+	private boolean isAlive = false, isFalling = true, isMoving = false;
 	
 	public Player(int x, int y, Map map) {
 		this.x = x;
@@ -37,36 +33,37 @@ public class Player {
 			vy += 0.3;
 			if(map.isWall(getCorner(2), 1, (int)vy) || map.isWall(getCorner(3), -1, (int)vy)) {
 				isFalling = false;
-				y = map.size*(int)((getCorner(2)[1] + vy)/map.size) - height/2;
+				y = map.size*(int)(y/map.size + 1) - height/2;
 				vy = 0;
 			}
 		}
-		
 		if(vy < 0) {
 			if(map.isWall(getCorner(0), -1, (int)vy) || map.isWall(getCorner(1), 1, (int)vy)) {
-				y = map.size*(int)((getCorner(2)[1])/map.size) + height/2 + 1;
+				y = map.size*(int)(y/map.size) + height/2;
 				vy = 0;
 			}
 		}
 		
 		if(!isMoving)vx *= 0.95;
+		if(vx < 0.1 && vx > -0.1)vx = 0;
 		
 		if(vx > 0) {
-			if(map.isWall((int)(getCorner(0)[0] + vx), (int)(getCorner(0)[1] - 1)) || map.isWall((int)(getCorner(3)[0] + vx), (int)(getCorner(3)[1] - 1))) {
-				x = map.size*(int)((getCorner(0)[0] + vx)/map.size) - width/2;
+			if(map.isWall(getCorner(0), (int)vx, 1) || map.isWall(getCorner(3), (int)vx, -1)) {
+				x = map.size*(int)((getCorner(0)[0] + vx)/map.size) - width/2 - 1;
+				vx = 0;
+			}
+		}else if(vx < 0) {
+			if(map.isWall(getCorner(1), (int)vx, 1) || map.isWall(getCorner(2), (int)vx, -1)) {
+				x = map.size*(int)((getCorner(1)[0] + 1)/map.size) + width/2 + 1;
 				vx = 0;
 			}
 		}
 		
-		if(vx < 0) {
-			if(map.isWall((int)(getCorner(1)[0] + vx), (int)(getCorner(1)[1] - 1)) || map.isWall((int)(getCorner(2)[0] + vx), (int)(getCorner(2)[1] - 1))) {
-				x = map.size*(int)((getCorner(0)[0])/map.size) + width/2;
-				vx = 0;
-			}
-		}
+		if(y > ScreenController.height + height || (y < 0 && !isFalling))isAlive = false;
 		
 		x += vx;
 		y += vy;
+		jumpTime--;
 		
 		checkSight();
 		
@@ -111,7 +108,7 @@ public class Player {
 				if(map.isWall(tx, ty) || l == 40) {
 					sightPoints[i][0] = tx - (int)x;
 					sightPoints[i][1] = ty - (int)y;
-					sightPoints[i][2] = l*100/40;
+					sightPoints[i][2] = (int)l;
 					break;
 				}
 			}
@@ -131,11 +128,12 @@ public class Player {
 	
 	public void reset(int x, int y) {
 		isAlive = false;
+		isFalling = true;
 		setPos(x,y);
+		jumpTime = 0;
+		scoreOffset = 0;
 		vx = 0;
 		vy = 0;
-		numUpgrades = 0;
-		carry = 0;
 	}
 	
 	public void moveLeft() {
@@ -149,7 +147,11 @@ public class Player {
 	}
 	
 	public void jump() {
-		if(!isFalling)vy = -10;
+		if(!isFalling) {
+			jumpTime = 120;
+			scoreOffset += 20;
+			vy = -10;
+		}
 	}
 	
 	public int getX() {
@@ -160,6 +162,14 @@ public class Player {
 		return (int)y;
 	}
 	
+	public double getVX() {
+		return vx / maxSpeed;
+	}
+	
+	public double getVY() {
+		return vy / maxSpeed;
+	}
+	
 	public void kill() {
 		isAlive = false;
 	}
@@ -168,12 +178,8 @@ public class Player {
 		return isAlive;
 	}
 	
-	public int[] getSightPoints(int i, double length) {
-		
-		int[] ret = new int[3];
-		
-		return ret;
-		
+	public int getScoreOffset() {
+		return scoreOffset;
 	}
 	
 	public int[] getCorner(int i) {
@@ -194,7 +200,7 @@ public class Player {
 	}
 	
 	public double getSightLength(int i) {
-		return ((double)sightPoints[i][2]/100.0);
+		return ((double)sightPoints[i][2]/(map.size*5));
 	}
 	
 }

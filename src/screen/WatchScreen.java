@@ -28,7 +28,6 @@ public class WatchScreen extends Screen{
 		init = true;
 		contInit = true;
 		map.reset();
-		//map.randomize();
 		map.start();
 		network.setScore(0);
 		killtime = 120;
@@ -41,11 +40,20 @@ public class WatchScreen extends Screen{
 	public void update(){
 		
 		if(map.getPlayer().isAlive()) {
-			Matrix next = network.simpleTest(Matrix.rowMatrix(new double[] {
-					1-map.getPlayer().getSightLength(0),
-					1-map.getPlayer().getSightLength(1),
-					1-map.getPlayer().getSightLength(2),
-					}));
+			
+			double[] inputData = new double[18];
+			
+			for(int i = 0; i < 16; i++)inputData[i] = map.getPlayer().getSightLength(i);
+			
+			inputData[16] = map.getPlayer().getVX();
+			inputData[17] = map.getPlayer().getVY();
+			
+			Matrix next = network.simpleTest(Matrix.rowMatrix(inputData));
+			
+			if(next.getAttribute(0, 0) > 0.5)map.getPlayer().jump();
+			if(next.getAttribute(1, 0) > 0.5)map.getPlayer().moveLeft();
+			if(next.getAttribute(2, 0) > 0.5)map.getPlayer().moveRight();
+			
 		}else {
 			killtime--;
 			
@@ -81,7 +89,7 @@ public class WatchScreen extends Screen{
 		
 		map.update();
 		
-		network.setScore(map.getPlayer().getX() - map.getTime()*0);
+		network.setScore(map.getPlayer().getX() - map.getTime()*0 - map.getPlayer().getScoreOffset());
 		
 	}
 	

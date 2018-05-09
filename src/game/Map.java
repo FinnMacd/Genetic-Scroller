@@ -13,7 +13,8 @@ public class Map {
 	public int width, height, size = 80;
 	private int[][] map;
 	
-	private int numUps, updateCap = 800, startX = 60, startY = 240, screenX = 0;
+	private int numUps, startX = 120, startY = 240, screenX = 0;
+	public int updateCap = 1000;
 	
 	public Map() {
 		
@@ -45,7 +46,7 @@ public class Map {
 	public void reset() {
 		player.reset(startX, startY);
 		screenX = 0;
-		updateCap = 800;
+		updateCap = 1000;
 	}
 	
 	public void update() {
@@ -56,6 +57,9 @@ public class Map {
 		if(screenX > width*size - ScreenController.width)screenX = width*size - ScreenController.width;
 		
 		player.update();
+		
+		if(updateCap == 0)player.kill();
+		else updateCap--;
 		
 	}
 	

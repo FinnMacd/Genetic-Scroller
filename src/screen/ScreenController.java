@@ -51,7 +51,8 @@ public class ScreenController extends Canvas implements Runnable{
 			new ControlScreen(this)
 			
 		};
-		changeScreen(GAME);
+//		changeScreen(GAME);
+		changeScreen(CONTROL);
 		
 		
 	}

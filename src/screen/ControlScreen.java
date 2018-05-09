@@ -13,7 +13,7 @@ public class ControlScreen extends Screen{
 	private int generation = 0;
 	private int bestScore = 0, averageScore = 0;
 	
-	private boolean testing = false, doneTest = false, hasEvolved = true;
+	private boolean testing = false, doneTest = false, hasEvolved = true, contEvolve = false;
 	private int currentTest = 0;
 	
 	public ControlScreen(ScreenController screen) {
@@ -27,13 +27,12 @@ public class ControlScreen extends Screen{
 		networks = new Network[100];
 		
 		for(int i = 0; i < networks.length; i++) {
-			networks[i] = new Network(4,50,3);
+			networks[i] = new Network(18,100,3);
 			networks[i].setID(i);
 		}
 		System.out.println(networks[currentTest].getScore());
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void update() {
 		
 		if(testing) {
@@ -75,13 +74,18 @@ public class ControlScreen extends Screen{
 					
 			}
 			
-			if(ScreenController.input.space) {
+			else if(ScreenController.input.space) {
 				testing = true;
 				currentTest = 0;
 				ScreenController.input.space = false;
 			}
 			
-			if(ScreenController.input.right) {
+			else if(ScreenController.input.enter) {
+				contEvolve = !contEvolve;
+				ScreenController.input.enter = false;
+			}
+			
+			else if(ScreenController.input.right || contEvolve) {
 				testing = true;
 				currentTest = 0;
 				ScreenController.input.right = false;

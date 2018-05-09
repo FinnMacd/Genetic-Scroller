@@ -14,7 +14,8 @@ import screen.ScreenController;
 
 public class Inputs implements KeyListener, MouseListener,MouseMotionListener,FocusListener,MouseWheelListener{
 	
-	public static volatile boolean left = false,right = false,up = false,down = false,ctrl = false,mleft = false,cmleft = false,mright = false,focus = false,space = false;
+	public static volatile boolean left = false,right = false,up = false,down = false,ctrl = false,
+			mleft = false,cmleft = false,mright = false,focus = false,space = false, enter = false;
 	public static int mx = 0,my = 0,notches = 0;
 	
 	private ScreenController gp;
@@ -80,6 +81,7 @@ public class Inputs implements KeyListener, MouseListener,MouseMotionListener,Fo
 		if(key == KeyEvent.VK_A)left = true;
 		if(key == KeyEvent.VK_SPACE)space = true;
 		if(key == KeyEvent.VK_CONTROL)ctrl = true;
+		if(key == KeyEvent.VK_ENTER)enter = true;
 		
 	}
 
